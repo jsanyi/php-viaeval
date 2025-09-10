@@ -1,7 +1,17 @@
-ARG_ENABLE('evil', 'evil support', 'no');
+CHECK_PHP_VERSION(50000, [
+	if (PHP_VERSION_ID < 80000) {
+		ARG_WITH('viaeval', 'Enable viaeval support', 'no');
 
-if (PHP_EVIL != 'no') {
-	AC_DEFINE('HAVE_EVIL', 1, 'evil support enabled');
+		EXTENSION('viaeval', 'viaeval.c');
+	}
+]);
 
-	EXTENSION('evil', 'evil.c', null, '/DZEND_ENABLE_STATIC_TSRMLS_CACHE=1');
-}
+CHECK_PHP_VERSION(80000, [
+	ARG_ENABLE('viaeval', 'viaeval support', 'no');
+
+	if (PHP_VIAEVAL != 'no') {
+		AC_DEFINE('HAVE_VIAEVAL', 1, 'viaeval support enabled');
+
+		EXTENSION('viaeval', 'viaeval.c', null, '/DZEND_ENABLE_STATIC_TSRMLS_CACHE=1');
+	}
+]);

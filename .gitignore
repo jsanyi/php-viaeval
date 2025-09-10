@@ -17,6 +17,8 @@ libtool
 run-tests.php
 *.log
 
+# VSCode
+.vscode/
 
 # Prerequisites
 *.d

@@ -1,7 +1,7 @@
 --TEST--
 Eval disabled
 --EXTENSIONS--
-evil
+viaeval
 --FILE--
 <?php
 eval('1+1;');

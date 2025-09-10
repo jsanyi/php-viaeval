@@ -1,10 +1,10 @@
 --TEST--
-Check if evil is loaded
+Check if viaeval is loaded
 --EXTENSIONS--
-evil
+viaeval
 --FILE--
 <?php
-echo 'The extension "evil" is available';
+echo 'The extension "viaeval" is available';
 ?>
 --EXPECT--
-The extension "evil" is available
+The extension "viaeval" is available

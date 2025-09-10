@@ -1,7 +1,16 @@
-# Evil Eval PHP 8 
-PHP extension to disable the `eval` language construct in PHP8
+# ViaEval PHP5 - PHP8
+PHP extension to disable the `eval` language construct in PHP5-PHP8
 
-## Reasons
+## Modifications by Sandor Jager
+- Functionally merged with https://github.com/mk-j/PHP_diseval_extension/tree/master so it also supports PHP5-PHP7
+- Added ini parameters to be used in multi-user hosting environments
+  - viaeval.disable_eval can be used to bail out on eval() call
+  - viaeval.monitor_eval can be used to log a warning on an eval() while calls are not disabled
+  - parameters can be set in system or perdir scope, but not in user scope (aka ini_set())
+- Added file or folder exclude support via viaeval.eval_exclude (as comma separated paths)
+- Removed info function
+
+## Reasons (from original author)
 I got sick of hackers and others who trying to execute different PHP shells
 based on execution of eval. I can turn off dangerous functions through the php.ini,
 but I can't turn off the `eval` using standard methods.
@@ -10,7 +19,7 @@ but I can't turn off the `eval` using standard methods.
 because `eval` is not a function!
 
 I haven't found Suhosin module for PHP 8.0 or any other solutions.
-So I wrote an extension for this.
+So I wrote an extension for this. (And )
 
 ```php
 eval('$i = 123');
@@ -24,7 +33,7 @@ Or, if disabled hide presence this extension
 eval('$i = 123');
 
 // Result of execution
-Fatal error: eval is not a function in /www/index.php on line 3
+Fatal error: [eval] is not a function in /www/index.php on line 3
 ```
 
 In PHP 8 no longer supports eval by:
@@ -34,26 +43,20 @@ In PHP 8 no longer supports eval by:
 
 And now with my extension, you can disable `eval`
 
-![Disable eval in PHP8 Screenshot](https://raw.githubusercontent.com/frontdevops/php-evil/main/assets/img1.png)
+![Disable eval in PHP8 Screenshot](https://raw.githubusercontent.com/jsanyi/php-viaeval/main/assets/img1.jpg)
 
 Or
 
-![Disable eval in PHP8 Screenshot](https://raw.githubusercontent.com/frontdevops/php-evil/main/assets/img2.png)
-
-
-## Versions
-- Works for PHP8.
-- Tested in PHP 8.0.8 on my production server and it works well.
-  Possibly more versions, but I haven't explicitly tested it.
+![Disable eval in PHP8 Screenshot](https://raw.githubusercontent.com/jsanyi/php-viaeval/main/assets/img2.jpg)
 
 
 ## Build instructions
-1. `git clone https://github.com/frontdevops/php-evil`
-2. `cd php-evil`
+1. `git clone https://github.com/jsanyi/php-viaeval`
+2. `cd php-viaeval`
 3. `phpize`
 4. `./configure` or `./configure --enable-hide-presence` (whether to hide presence this extension)
 5. `make && make install`
-6. Add to php.ini `extension=evil.so`
+6. Add to php.ini `extension=viaeval.so`
 
 
 ## Build in Docker
@@ -61,13 +64,13 @@ Or
 FROM php:8.0-fpm
 
 
-RUN git clone https://github.com/frontdevops/php-evil && \
-    cd php-evil && \
+RUN git clone https://github.com/jsanyi/php-viaeval && \
+    cd php-viaeval && \
     phpize && ./configure --enable-hide-presence && \
     make && make install && \
-    echo "extension=evil.so" > /usr/local/etc/php/conf.d/evil.ini && \
+    echo "extension=viaeval.so" > /usr/local/etc/php/conf.d/viaeval.ini && \
     cd .. && \
-    rm -rf php-evil
+    rm -rf php-viaeval
 
 ```
 
@@ -78,7 +81,8 @@ RUN git clone https://github.com/frontdevops/php-evil && \
 2. No guarantees that any of this works anymore
 3. I will not be responsible for your code and do not guarantee
    that everything works as it should on your server.
-4. Other in [No license text](https://github.com/frontdevops/php-evil/blob/main/LICENSE)
+4. Other in [No license text](https://github.com/jsanyi/php-viaeval/blob/main/LICENSE)
+5. Other in [No license text](https://github.com/mk-j/PHP_diseval_extension/blob/master/LICENSE)
 
 
 ## Feedback and supports
