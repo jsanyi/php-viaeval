@@ -2,6 +2,7 @@
 PHP extension to disable the `eval` language construct in PHP5-PHP8
 
 ## Modifications by Sandor Jager
+- Original project was https://github.com/frontdevops/php-evil
 - Functionally merged with https://github.com/mk-j/PHP_diseval_extension/tree/master so it also supports PHP5-PHP7
 - Added ini parameters to be used in multi-user hosting environments
   - viaeval.disable_eval can be used to bail out on eval() call
@@ -19,7 +20,7 @@ but I can't turn off the `eval` using standard methods.
 because `eval` is not a function!
 
 I haven't found Suhosin module for PHP 8.0 or any other solutions.
-So I wrote an extension for this. (And )
+So I wrote an extension for this.
 
 ```php
 eval('$i = 123');
@@ -81,8 +82,9 @@ RUN git clone https://github.com/jsanyi/php-viaeval && \
 2. No guarantees that any of this works anymore
 3. I will not be responsible for your code and do not guarantee
    that everything works as it should on your server.
-4. Other in [No license text](https://github.com/jsanyi/php-viaeval/blob/main/LICENSE)
+4. Other in [No license text](https://github.com/frontdevops/php-evil/blob/main/LICENSE)
 5. Other in [No license text](https://github.com/mk-j/PHP_diseval_extension/blob/master/LICENSE)
+6. Other in [No license text](https://github.com/jsanyi/php-viaeval/blob/main/LICENSE)
 
 
 ## Feedback and supports
