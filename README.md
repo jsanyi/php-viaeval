@@ -7,7 +7,7 @@ PHP extension to disable the `eval` language construct in PHP5-PHP8
 - Added ini parameters to be used in multi-user hosting environments
   - viaeval.disable_eval can be used to bail out on eval() call
   - viaeval.monitor_eval can be used to log a warning on an eval() while calls are not disabled
-  - parameters can be set in system or perdir scope, but not in user scope (aka ini_set())
+  - parameters can be set in system or per-dir scope, but not in user scope (aka ini_set())
 - Added file or folder exclude support via viaeval.eval_exclude (as comma separated paths)
 - Removed info function
 
@@ -36,6 +36,19 @@ eval('$i = 123');
 // Result of execution
 Fatal error: [eval] is not a function in /www/index.php on line 3
 ```
+
+Or, if you don't want to disable eval()'s just monitor when one was executed (viaeval.disable_eval=0 and viaeval.monitor_eval=1)
+```php
+eval("print (1 + 1);");
+
+//Result of execution
+Warning: [viaeval] eval() was called! in /www/index.php on line 3
+2
+```
+
+If "viaeval.eval_exclude" is empty (the default), eval() is disabled everywhere.
+You can specify the paths as a comma-separated list in the "viaeval.eval_exclude" ini parameter. If the list contains a specific file (e.g. somedir/anotherdir/file.php), then all eval() calls in that file will be executed. If the list contains a folder name ending in a slash (e.g. evaldir/), then all files in that folder will be executed.
+During execution, the elements of the list will always be compared starting from the right end of the current php file path.
 
 In PHP 8 no longer supports eval by:
 1. preg_replace('/a/e', $_REQUEST['shell'], 'a') -> Warning: preg_replace(): The /e modifier is no longer supported, use preg_replace_callback instead
