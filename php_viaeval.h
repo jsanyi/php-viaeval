@@ -41,8 +41,6 @@ PHP_MINFO_FUNCTION(viaeval);
 PHP_RINIT_FUNCTION(viaeval);
 PHP_RSHUTDOWN_FUNCTION(viaeval);
 
-static int viaeval_is_exception_file(const char *filename);
-
 ZEND_BEGIN_MODULE_GLOBALS(viaeval)
     zend_bool disable_eval;
     zend_bool monitor_eval;

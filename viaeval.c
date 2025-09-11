@@ -9,6 +9,8 @@
 
 static void (*zend_old_execute_ex)(zend_execute_data *execute_data) = NULL;
 
+static int viaeval_is_exception_file(const char *filename);
+
 ZEND_DECLARE_MODULE_GLOBALS(viaeval)
 static PHP_GINIT_FUNCTION(viaeval);
 
@@ -33,50 +35,6 @@ static PHP_GINIT_FUNCTION(viaeval)
     viaeval_globals->disable_eval = 0;
     viaeval_globals->monitor_eval = 0;
     viaeval_globals->eval_exclude = NULL;
-}
-
-void viaeval_execute_ex(zend_execute_data *execute_data TSRMLS_DC)
-{
-    const char *current_filename = zend_get_executed_filename();
-
-#if PHP_VERSION_ID >= 70000
-    const zend_op_array *op_array = &execute_data->func->op_array;
-#else
-    const zend_op_array *op_array = execute_data->op_array;
-#endif
-
-    if (!VIAEVAL_G(disable_eval))
-    {
-#if PHP_VERSION_ID >= 80000
-        if (execute_data->opline && (ZEND_INCLUDE_OR_EVAL == execute_data->opline->opcode) && (ZEND_EVAL == execute_data->opline->extended_value))
-#else
-        if (op_array->type == ZEND_EVAL_CODE)
-#endif
-        {
-            if (VIAEVAL_G(monitor_eval) && !viaeval_is_exception_file(current_filename))
-            {
-                php_error(E_WARNING, "[viaeval] eval() was called!");
-            }
-        }
-        zend_old_execute_ex(execute_data TSRMLS_DC);
-        return;
-    }
-
-#if PHP_VERSION_ID >= 80000
-    if (execute_data->opline && (ZEND_INCLUDE_OR_EVAL == execute_data->opline->opcode) && (ZEND_EVAL == execute_data->opline->extended_value) && !viaeval_is_exception_file(current_filename))
-#else
-    if (op_array->type == ZEND_EVAL_CODE && !viaeval_is_exception_file(current_filename))
-#endif
-    {
-#ifdef HIDE_PRESENCE
-        zend_error(E_PARSE, PHP_VIAEVAL_MSG);
-#else
-        zend_error(E_ERROR, PHP_VIAEVAL_MSG);
-#endif
-        zend_bailout();
-    }
-
-    zend_old_execute_ex(execute_data TSRMLS_DC);
 }
 
 static int viaeval_is_exception_file(const char *filename)
@@ -119,6 +77,50 @@ static int viaeval_is_exception_file(const char *filename)
         }
     } ZEND_HASH_FOREACH_END();
     return 0;
+}
+
+void viaeval_execute_ex(zend_execute_data *execute_data TSRMLS_DC)
+{
+    const char *current_filename = zend_get_executed_filename();
+
+#if PHP_VERSION_ID < 70000
+    const zend_op_array *op_array = execute_data->op_array;
+#elif PHP_VERSION_ID < 80000
+    const zend_op_array *op_array = &execute_data->func->op_array;
+#endif
+
+    if (!VIAEVAL_G(disable_eval))
+    {
+#if PHP_VERSION_ID >= 80000
+        if (execute_data->opline && (ZEND_INCLUDE_OR_EVAL == execute_data->opline->opcode) && (ZEND_EVAL == execute_data->opline->extended_value))
+#else
+        if (op_array->type == ZEND_EVAL_CODE)
+#endif
+        {
+            if (VIAEVAL_G(monitor_eval) && !viaeval_is_exception_file(current_filename))
+            {
+                php_error(E_WARNING, "[viaeval] eval() was called!");
+            }
+        }
+        zend_old_execute_ex(execute_data TSRMLS_DC);
+        return;
+    }
+
+#if PHP_VERSION_ID >= 80000
+    if (execute_data->opline && (ZEND_INCLUDE_OR_EVAL == execute_data->opline->opcode) && (ZEND_EVAL == execute_data->opline->extended_value) && !viaeval_is_exception_file(current_filename))
+#else
+    if (op_array->type == ZEND_EVAL_CODE && !viaeval_is_exception_file(current_filename))
+#endif
+    {
+#ifdef HIDE_PRESENCE
+        zend_error(E_PARSE, PHP_VIAEVAL_MSG);
+#else
+        zend_error(E_ERROR, PHP_VIAEVAL_MSG);
+#endif
+        zend_bailout();
+    }
+
+    zend_old_execute_ex(execute_data TSRMLS_DC);
 }
 
 PHP_MINIT_FUNCTION(viaeval)
